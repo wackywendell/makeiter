@@ -21,6 +21,10 @@ impl<F, A> Iterator<A> for FuncIter<F> where F: FnMut() -> Option<A> {
     }
 }
 
+pub fn make_iter<F, A>(f : F) -> FuncIter<F> where F: FnMut() -> Option<A> {
+    FuncIter::new(f)
+}
+
 #[test]
 fn base_test() {
     assert_eq!(FuncIter::new(|| Some(3u)).next(), Some(3u));
@@ -33,6 +37,22 @@ fn base_test() {
     
     let mut i = 4u;
     let mut it = FuncIter::new(|| {
+        if i <= 0 {None}
+        else {i -= 1; Some(i)}
+    });
+    
+    assert_eq!(it.next(), Some(3));
+    assert_eq!(it.next(), Some(2));
+    assert_eq!(it.next(), Some(1));
+    assert_eq!(it.next(), Some(0));
+    assert_eq!(it.next(), None);
+    assert_eq!(it.next(), None);
+}
+
+#[test]
+fn make_iter_test() {
+    let mut i = 4u;
+    let mut it = make_iter(|| {
         if i <= 0 {None}
         else {i -= 1; Some(i)}
     });
